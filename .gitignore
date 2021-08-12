@@ -1,0 +1,6 @@
+/venv
+/out
+/test
+!/out/.gitkeep
+/.idea
+__pycache__
