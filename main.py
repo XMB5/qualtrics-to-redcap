@@ -54,7 +54,7 @@ class QualtricsConvert:
                 qid = question['QuestionID']
                 question = converter.find_question(qid)
                 qtype = question['QuestionType']
-                qtext = question['QuestionText']
+                qtext = question['QuestionText']  # QuestionText is html, QuestionDescription is plain text
                 required = 'y' if question['Validation']['Settings'].get('ForceResponse') == 'ON' else None
 
                 if qtype == 'MC':
