@@ -41,6 +41,8 @@ class QualtricsConvert:
         converter = QualtricsConvert(sys.argv[1])
 
         blocks = next(converter.find_elements('BL'))
+        if type(blocks) == dict:
+            blocks = blocks.values()
         standard_blocks = (block for block in blocks if block['Type'] == 'Standard')
 
         for block in standard_blocks:
@@ -53,7 +55,7 @@ class QualtricsConvert:
                 question = converter.find_question(qid)
                 qtype = question['QuestionType']
                 qtext = question['QuestionText']
-                required = 'y' if question['Validation']['Settings']['ForceResponse'] == 'ON' else None
+                required = 'y' if question['Validation']['Settings'].get('ForceResponse') == 'ON' else None
 
                 if qtype == 'MC':
                     choices = ' | '.join(f'{i}, {text}' for i, text in QualtricsConvert.read_order(question['Choices'], question['ChoiceOrder']))
@@ -95,6 +97,23 @@ class QualtricsConvert:
                             row['Section Header'] = qtext
                             first = False
                         rows.append(row)
+                elif qtype == 'TE':
+                    # text entry
+                    rows.append({
+                        'Variable / Field Name': f'{survey_name}_{qid}',
+                        'Form Name': survey_name,
+                        'Field Type': 'text',
+                        'Field Label': qtext,
+                        'Required Field?': required
+                    })
+                elif qtype == 'DB':
+                    # descriptive block
+                    rows.append({
+                        'Variable / Field Name': f'{survey_name}_{qid}',
+                        'Form Name': survey_name,
+                        'Field Type': 'descriptive',
+                        'Field Label': qtext
+                    })
                 else:
                     print(f'warning, can\'t handle question type {qtype} for question id {qid}')
                     continue
